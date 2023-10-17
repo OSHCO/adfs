@@ -1,0 +1,17 @@
+{
+    "name": "oshco/adfs",
+    "description": "Library to provide ADFS integration for WebFiori based applications.",
+    "require": {
+        "webfiori/http":"^v3.3.5",
+        "webfiori/file":"^v1.3.3",
+        "webfiori/jsonx":"^v3.3.0",
+        "webfiori/ui":"^v2.5.6",
+    },
+    "keywords": [
+        "ADFS",
+        "webfiori",
+        "API",
+        "Web APIs",
+    ],
+    "license": "MIT"
+}
