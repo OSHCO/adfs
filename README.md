@@ -1,2 +1,2 @@
 # ADFS Integration
-Provides simple way to integrate your application with ADFS using PHP.
+Provides simple way to integrate your WebFiori application with ADFS.
