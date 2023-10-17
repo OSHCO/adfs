@@ -1,10 +1,8 @@
 <?php
 namespace oshco\adfs;
 
-use oshco\entity\ADFSUser;
-use oshco\entity\adfs\ADFSResponse;
-use webfiori\framework\App;
-use webfiori\framework\EAbstractWebService;
+use oshco\adfs\ADFSUser;
+use oshco\adfs\ADFSResponse;
 use webfiori\http\Response;
 
 
@@ -12,7 +10,7 @@ use webfiori\http\Response;
  * A class that contains the implementation of the service which is used to
  * verify the status of ADFS response.
  */
-abstract class ADFSVerificationService extends EAbstractWebService {
+abstract class ADFSVerificationService extends AbstractWebService {
     /**
      * 
      * @var ADFSResponse
@@ -22,8 +20,9 @@ abstract class ADFSVerificationService extends EAbstractWebService {
      * Creates new instance of the class.
      * 
      * @param string $name The name of the service.
+     * @param string $failRedirect A URL at which the user will be redirected to in case of ADFS login fail.
      */
-    public function __construct(string $name = 'verify-identity') {
+    public function __construct(string $name = 'verify', string $failRedirect = '') {
         parent::__construct($name);
         $this->addRequestMethod('POST');
         $this->addRequestMethod('GET');
@@ -32,7 +31,7 @@ abstract class ADFSVerificationService extends EAbstractWebService {
                 'type' => 'string'
             ]
         ]);
-        $this->setOnFailRedirect(App::getConfig()->getHomePage());
+        $this->setOnFailRedirect($failRedirect);
         $this->setFailStatus('');
     }
     /**
