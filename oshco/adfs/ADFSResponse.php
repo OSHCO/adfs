@@ -1,6 +1,7 @@
 <?php
 namespace oshco\adfs;
 
+use Exception;
 use webfiori\file\File;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
@@ -22,10 +23,20 @@ class ADFSResponse implements JsonI {
      */
     public function __construct(string $samlResponse) {
         $this->xmlString = base64_decode($samlResponse);
+        
         $node = TemplateCompiler::fromHTMLText($this->xmlString, false);
+
         $statusNode = $node->getChild(1)->getChild(0);
         $this->isSuccess = $statusNode->getAttribute('value') === 'urn:oasis:names:tc:SAML:2.0:status:Success';
-        $usernameNode = $node->getChildrenByTag('attributevalue')->get(0);
+        $this->checkUsernameandAppName($node);
+    }
+    private function checkUsernameandAppName(HTMLNode $node) {
+        
+        $xNodes = $node->getChildrenByTag('attributevalue');
+        if (count($xNodes) == 0) {
+            throw new Exception("The attribute 'username' is missing from SAML response. Please add it in ADFS.");
+        }
+        $usernameNode = $xNodes->get(0);
         $this->username = strtolower($usernameNode->getChild(0)->getText());
         $this->appName = str_replace('_', ' ', $node->getAttribute('inresponseto'));
     }
