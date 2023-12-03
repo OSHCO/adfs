@@ -1,8 +1,9 @@
 <?php
 namespace oshco\adfs;
 
-use oshco\adfs\ADFSUser;
 use oshco\adfs\ADFSResponse;
+use oshco\adfs\ADFSUser;
+use webfiori\http\AbstractWebService;
 use webfiori\http\Response;
 
 
