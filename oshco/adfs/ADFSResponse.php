@@ -2,11 +2,11 @@
 namespace oshco\adfs;
 
 use Exception;
-use webfiori\file\File;
-use webfiori\json\Json;
-use webfiori\json\JsonI;
-use webfiori\ui\HTMLNode;
-use webfiori\ui\TemplateCompiler;
+use WebFiori\File\File;
+use WebFiori\Json\Json;
+use WebFiori\Json\JsonI;
+use WebFiori\Ui\HTMLNode;
+use WebFiori\Ui\TemplateCompiler;
 /**
  * A class which is used to represent ADFS response.
  *

@@ -1,7 +1,7 @@
 <?php
 namespace oshco\adfs;
 
-use webfiori\ui\HTMLNode;
+use WebFiori\Ui\HTMLNode;
 
 /**
  * A class which is used to build SAML request based on user inputs.
