@@ -3,15 +3,17 @@ namespace oshco\adfs;
 
 use oshco\adfs\ADFSResponse;
 use oshco\adfs\ADFSUser;
-use WebFiori\Http\AbstractWebService;
-use WebFiori\Http\Response;
+use WebFiori\Http\ParamOption;
+use WebFiori\Http\ParamType;
+use WebFiori\Http\RequestMethod;
+use WebFiori\Http\WebService;
 
 
 /**
  * A class that contains the implementation of the service which is used to
  * verify the status of ADFS response.
  */
-abstract class ADFSVerificationService extends AbstractWebService {
+abstract class ADFSVerificationService extends WebService {
     /**
      * 
      * @var ADFSResponse
@@ -25,11 +27,11 @@ abstract class ADFSVerificationService extends AbstractWebService {
      */
     public function __construct(string $name = 'verify', string $failRedirect = '') {
         parent::__construct($name);
-        $this->addRequestMethod('POST');
-        $this->addRequestMethod('GET');
+        $this->addRequestMethod(RequestMethod::POST);
+        $this->addRequestMethod(RequestMethod::GET);
         $this->addParameters([
             'SAMLResponse' => [
-                'type' => 'string'
+                ParamOption::TYPE => ParamType::STRING
             ]
         ]);
         $this->setOnFailRedirect($failRedirect);
@@ -57,10 +59,10 @@ abstract class ADFSVerificationService extends AbstractWebService {
      * 
      * @param ADFSUser|null $user
      */
-    public function onFail(ADFSUser $user = null) {
-        Response::addHeader('location', $this->getOnFailRedirect().'?status='. urlencode($this->getFailStatus()));
-        Response::setCode(401);
-        Response::send();
+    public function onFail(?ADFSUser $user = null) {
+        $this->getManager()->getResponse()->addHeader('location', $this->getOnFailRedirect().'?status='. urlencode($this->getFailStatus()));
+        $this->getManager()->getResponse()->setCode(401);
+        $this->getManager()->getResponse()->send();
     }
     /**
      * Execute the instructions in case of ADFS success.
