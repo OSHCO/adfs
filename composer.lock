@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4e0a1464448571c23158f2daba761e41",
+    "content-hash": "147dc64f5a9e6154fe8a2051c6e77708",
     "packages": [
         {
             "name": "webfiori/collections",
@@ -104,25 +104,26 @@
         },
         {
             "name": "webfiori/http",
-            "version": "4.0.0",
+            "version": "5.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WebFiori/http.git",
-                "reference": "b9eb529784cbec7a9c74fdf6a30efe0098f11ca8"
+                "reference": "2958177698151be6387ec26112868f4428b393ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WebFiori/http/zipball/b9eb529784cbec7a9c74fdf6a30efe0098f11ca8",
-                "reference": "b9eb529784cbec7a9c74fdf6a30efe0098f11ca8",
+                "url": "https://api.github.com/repos/WebFiori/http/zipball/2958177698151be6387ec26112868f4428b393ba",
+                "reference": "2958177698151be6387ec26112868f4428b393ba",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "ext-mbstring": "*",
-                "php": ">=7.0",
+                "php": ">=8.1",
                 "webfiori/jsonx": "4.0.x"
             },
             "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.92",
                 "phpunit/phpunit": "^10.0"
             },
             "type": "library",
@@ -148,34 +149,30 @@
             ],
             "support": {
                 "issues": "https://github.com/WebFiori/http/issues",
-                "source": "https://github.com/WebFiori/http/tree/v4.0.0"
+                "source": "https://github.com/WebFiori/http/tree/v5.0.5"
             },
-            "funding": [
-                {
-                    "url": "https://paypal.me/IbrahimBinAlshikh",
-                    "type": "custom"
-                }
-            ],
-            "time": "2025-08-06T20:32:03+00:00"
+            "time": "2026-03-05T12:03:16+00:00"
         },
         {
             "name": "webfiori/jsonx",
-            "version": "4.0.0",
+            "version": "4.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WebFiori/json.git",
-                "reference": "d1605b5025ffec5a48a4b0330208c09631900a03"
+                "reference": "ad983ac6683ff0d12e1ef57546fbb68dd4d317ad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WebFiori/json/zipball/d1605b5025ffec5a48a4b0330208c09631900a03",
-                "reference": "d1605b5025ffec5a48a4b0330208c09631900a03",
+                "url": "https://api.github.com/repos/WebFiori/json/zipball/ad983ac6683ff0d12e1ef57546fbb68dd4d317ad",
+                "reference": "ad983ac6683ff0d12e1ef57546fbb68dd4d317ad",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.0"
+                "ext-json": "*",
+                "php": ">=8.1"
             },
             "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.92",
                 "phpunit/phpunit": "^10.0"
             },
             "type": "library",
@@ -196,7 +193,7 @@
             ],
             "support": {
                 "issues": "https://github.com/WebFiori/json/issues",
-                "source": "https://github.com/WebFiori/json/tree/v4.0.0"
+                "source": "https://github.com/WebFiori/json/tree/v4.0.1"
             },
             "funding": [
                 {
@@ -204,7 +201,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2025-08-03T15:19:48+00:00"
+            "time": "2026-03-04T10:29:17+00:00"
         },
         {
             "name": "webfiori/ui",

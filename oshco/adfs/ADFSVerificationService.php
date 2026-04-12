@@ -4,7 +4,6 @@ namespace oshco\adfs;
 use oshco\adfs\ADFSResponse;
 use oshco\adfs\ADFSUser;
 use WebFiori\Http\AbstractWebService;
-use WebFiori\Http\Response;
 
 
 /**
@@ -58,9 +57,9 @@ abstract class ADFSVerificationService extends AbstractWebService {
      * @param ADFSUser|null $user
      */
     public function onFail(?ADFSUser $user = null) {
-        Response::addHeader('location', $this->getOnFailRedirect().'?status='. urlencode($this->getFailStatus()));
-        Response::setCode(401);
-        Response::send();
+        $this->getManager()->getResponse()->addHeader('location', $this->getOnFailRedirect().'?status='. urlencode($this->getFailStatus()));
+        $this->getManager()->getResponse()->setCode(401);
+        $this->getManager()->getResponse()->send();
     }
     /**
      * Execute the instructions in case of ADFS success.

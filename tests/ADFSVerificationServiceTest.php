@@ -4,6 +4,7 @@ namespace oshco\adfs\tests;
 use oshco\adfs\ADFSUser;
 use oshco\adfs\ADFSVerificationService;
 use PHPUnit\Framework\TestCase;
+use WebFiori\Http\WebServicesManager;
 
 /**
  * A concrete test implementation of ADFSVerificationService.
@@ -52,6 +53,29 @@ class TestVerificationService extends ADFSVerificationService {
         $this->successCalled = false;
         $this->failCalled = false;
         $this->lastUser = null;
+    }
+}
+
+/**
+ * A concrete subclass that uses the real onFail implementation.
+ * Only overrides onSuccess since it's abstract.
+ */
+class RealFailVerificationService extends ADFSVerificationService {
+    private $mockUser;
+
+    public function __construct(string $name = 'real-verify', string $failRedirect = 'https://example.com/fail') {
+        parent::__construct($name, $failRedirect);
+    }
+
+    public function setMockUser(?ADFSUser $user) {
+        $this->mockUser = $user;
+    }
+
+    public function getUser(string $username): ?ADFSUser {
+        return $this->mockUser;
+    }
+
+    public function onSuccess(ADFSUser $user) {
     }
 }
 
@@ -171,5 +195,93 @@ class ADFSVerificationServiceTest extends TestCase {
 
     protected function tearDown(): void {
         unset($_POST['SAMLResponse']);
+    }
+
+    private function createRealFailService(string $failRedirect = 'https://example.com/fail'): RealFailVerificationService {
+        $svc = new RealFailVerificationService('real-verify', $failRedirect);
+        $mgr = new WebServicesManager();
+        $mgr->addService($svc);
+        return $svc;
+    }
+
+    public function testOnFailSetsResponseCode401() {
+        $svc = $this->createRealFailService();
+        $svc->onFail();
+        $this->assertSame(401, $svc->getManager()->getResponse()->getCode());
+    }
+
+    public function testOnFailSetsLocationHeaderWithRedirectUrl() {
+        $svc = $this->createRealFailService('https://myapp.example.com/login');
+        $svc->onFail();
+        $headers = $svc->getManager()->getResponse()->getHeaders();
+        $found = false;
+        foreach ($headers as $h) {
+            $str = $h . '';
+            if (str_contains($str, 'https://myapp.example.com/login')) {
+                $found = true;
+                break;
+            }
+        }
+        $this->assertTrue($found, 'Location header should contain the fail redirect URL');
+    }
+
+    public function testOnFailAppendsStatusToRedirectUrl() {
+        $svc = $this->createRealFailService('https://example.com/error');
+        $svc->setFailStatus('USER_NOT_FOUND');
+        $svc->onFail();
+        $headers = $svc->getManager()->getResponse()->getHeaders();
+        $found = false;
+        foreach ($headers as $h) {
+            $str = $h . '';
+            if (str_contains($str, '?status=USER_NOT_FOUND')) {
+                $found = true;
+                break;
+            }
+        }
+        $this->assertTrue($found, 'Location header should contain encoded fail status');
+    }
+
+    public function testOnFailUrlEncodesStatus() {
+        $svc = $this->createRealFailService('https://example.com/error');
+        $svc->setFailStatus('error with spaces');
+        $svc->onFail();
+        $headers = $svc->getManager()->getResponse()->getHeaders();
+        $found = false;
+        foreach ($headers as $h) {
+            $str = $h . '';
+            if (str_contains($str, '?status=' . urlencode('error with spaces'))) {
+                $found = true;
+                break;
+            }
+        }
+        $this->assertTrue($found, 'Fail status should be URL-encoded in the location header');
+    }
+
+    public function testOnFailWithEmptyStatus() {
+        $svc = $this->createRealFailService('https://example.com/fail');
+        $svc->onFail();
+        $headers = $svc->getManager()->getResponse()->getHeaders();
+        $found = false;
+        foreach ($headers as $h) {
+            $str = $h . '';
+            if (str_contains($str, 'https://example.com/fail?status=')) {
+                $found = true;
+                break;
+            }
+        }
+        $this->assertTrue($found, 'Location header should still include ?status= even when empty');
+    }
+
+    public function testOnFailAcceptsNullUser() {
+        $svc = $this->createRealFailService();
+        // Should not throw
+        $svc->onFail(null);
+        $this->assertSame(401, $svc->getManager()->getResponse()->getCode());
+    }
+
+    public function testOnFailAcceptsUserObject() {
+        $svc = $this->createRealFailService();
+        $svc->onFail(new TestUser(99));
+        $this->assertSame(401, $svc->getManager()->getResponse()->getCode());
     }
 }
