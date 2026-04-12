@@ -57,7 +57,7 @@ abstract class ADFSVerificationService extends AbstractWebService {
      * 
      * @param ADFSUser|null $user
      */
-    public function onFail(ADFSUser $user = null) {
+    public function onFail(?ADFSUser $user = null) {
         Response::addHeader('location', $this->getOnFailRedirect().'?status='. urlencode($this->getFailStatus()));
         Response::setCode(401);
         Response::send();
