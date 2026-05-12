@@ -31,7 +31,8 @@ abstract class ADFSVerificationService extends WebService {
         $this->addRequestMethod(RequestMethod::GET);
         $this->addParameters([
             'SAMLResponse' => [
-                ParamOption::TYPE => ParamType::STRING
+                ParamOption::TYPE => ParamType::STRING,
+                ParamOption::OPTIONAL => true
             ]
         ]);
         $this->setOnFailRedirect($failRedirect);
