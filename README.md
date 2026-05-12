@@ -23,21 +23,21 @@ composer require oshco/adfs
 3. ADFS posts a SAML response back to your application's callback endpoint.
 4. Your `ADFSVerificationService` subclass parses the response, looks up the user, and handles success or failure.
 
-## Classes and Interfaces
+## Classes
 
 | Class / Interface | Description |
 |---|---|
-| [`ADFSUser`](oshco/adfs/ADFSUser.php) | Interface representing an authenticated user. Requires `getId()`. |
-| [`SAMLRequest`](oshco/adfs/SAMLRequest.php) | Builds a SAML 2.0 authentication request. Supports XML generation and base64+deflate encoding for HTTP-Redirect binding. |
-| [`ADFSResponse`](oshco/adfs/ADFSResponse.php) | Parses a base64-encoded SAML response from ADFS. Extracts success/failure status, username, and application name. |
-| [`ADFSVerificationService`](oshco/adfs/ADFSVerificationService.php) | Abstract web service that acts as the ADFS callback endpoint. Subclass it to implement `getUser()` and `onSuccess()`. |
+| [`ADFSUser`](Oshco/Adfs/ADFSUser.php) | Interface representing an authenticated user. Requires `getId()`. |
+| [`SAMLRequest`](Oshco/Adfs/SAMLRequest.php) | Builds a SAML 2.0 authentication request. Supports XML generation and base64+deflate encoding for HTTP-Redirect binding. |
+| [`ADFSResponse`](Oshco/Adfs/ADFSResponse.php) | Parses a base64-encoded SAML response from ADFS. Extracts success/failure status, username, and application name. |
+| [`ADFSVerificationService`](Oshco/Adfs/ADFSVerificationService.php) | Abstract web service that acts as the ADFS callback endpoint. Subclass it to implement `getUser()` and `onSuccess()`. |
 
 ## Usage
 
 ### 1. Implement the `ADFSUser` interface
 
 ```php
-use oshco\adfs\ADFSUser;
+use Oshco\Adfs\ADFSUser;
 
 class AppUser implements ADFSUser {
     private int $id;
@@ -57,7 +57,7 @@ class AppUser implements ADFSUser {
 ### 2. Build and send a SAML request
 
 ```php
-use oshco\adfs\SAMLRequest;
+use Oshco\Adfs\SAMLRequest;
 
 $request = new SAMLRequest();
 $request->setDestination('https://adfs.example.com/adfs/ls');
@@ -76,8 +76,8 @@ header('Location: https://adfs.example.com/adfs/ls?SAMLRequest=' . urlencode($en
 Extend `ADFSVerificationService` and implement the two abstract methods:
 
 ```php
-use oshco\adfs\ADFSUser;
-use oshco\adfs\ADFSVerificationService;
+use Oshco\Adfs\ADFSUser;
+use Oshco\Adfs\ADFSVerificationService;
 
 class MyVerificationService extends ADFSVerificationService {
 
@@ -105,7 +105,7 @@ When ADFS posts back to your endpoint, the service will:
 ### 4. Inspect the SAML response
 
 ```php
-use oshco\adfs\ADFSResponse;
+use Oshco\Adfs\ADFSResponse;
 
 $response = new ADFSResponse($_POST['SAMLResponse']);
 
@@ -121,6 +121,10 @@ $response->storeResponse(); // save response to file for debugging
 ```bash
 composer test
 ```
+
+## Maintainer
+
+- Ibrahim BinAlshikh (i.binalshikh@oshco.com)
 
 ## License
 
