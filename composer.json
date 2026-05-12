@@ -1,6 +1,12 @@
 {
     "name": "oshco/adfs",
     "description": "Library to provide ADFS integration for WebFiori based applications.",
+    "authors": [
+        {
+            "name": "Ibrahim BinAlshikh",
+            "email": "i.binalshikh@oshco.com"
+        }
+    ],
     "require": {
         "webfiori/http": "5.0.*",
         "webfiori/file": "2.0.*",
@@ -19,7 +25,7 @@
     },
     "autoload": {
         "psr-4": {
-            "oshco\\adfs\\": "oshco/adfs"
+            "Oshco\\": "Oshco/"
         }
     },
     "scripts": {
@@ -27,7 +33,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "oshco\\adfs\\tests\\": "tests"
+            "Tests\\": "tests/"
         }
     }
 }

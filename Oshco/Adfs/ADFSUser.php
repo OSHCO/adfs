@@ -1,5 +1,5 @@
 <?php
-namespace oshco\adfs;
+namespace Oshco\Adfs;
 
 /**
  * An interface which is used to represent ADFS user.

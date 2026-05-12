@@ -1,5 +1,5 @@
 <?php
-namespace oshco\adfs;
+namespace Oshco\Adfs;
 
 use Oshco\Adfs\ADFSResponse;
 use Oshco\Adfs\ADFSUser;
@@ -31,7 +31,8 @@ abstract class ADFSVerificationService extends WebService {
         $this->addRequestMethod(RequestMethod::GET);
         $this->addParameters([
             'SAMLResponse' => [
-                ParamOption::TYPE => ParamType::STRING
+                ParamOption::TYPE => ParamType::STRING,
+                ParamOption::OPTIONAL => true
             ]
         ]);
         $this->setOnFailRedirect($failRedirect);
@@ -43,7 +44,7 @@ abstract class ADFSVerificationService extends WebService {
      * The username of the user will be taken from ADFS response as received.
      * The method must be implemented in a way that it looks for such user
      * in the application's database which has provided username/email and
-     * return its information as an object of type 'oshco\adfs\ADFSUser'.
+     * return its information as an object of type 'Oshco\Adfs\ADFSUser'.
      * If no such user was found, null should be returned.
      * 
      * @return ADFSUser|null
@@ -134,17 +135,7 @@ abstract class ADFSVerificationService extends WebService {
      * Process the request.
      */
     public function processRequest() {
-        if ($this->getParamVal('SAMLResponse') === null) {
-            if (isset($_POST['SAMLResponse'])) {
-                $this->samlResponse = new ADFSResponse($_POST['SAMLResponse']);
-            } else if (isset($_POST['SAMLResponse'])) {
-                $this->samlResponse = new ADFSResponse($_GET['SAMLResponse']);
-            } else {
-                $this->sendResponse('SAMLResponse is not provided.');
-            }
-        } else {
-            $this->samlResponse = new ADFSResponse($this->getParamVal('SAMLResponse'));
-        }
+        $this->samlResponse = new ADFSResponse($_POST['SAMLResponse']);
 
         if ($this->getSamlResponse()->isSuccess()) {
             $username = $this->getSamlResponse()->getUserName();
