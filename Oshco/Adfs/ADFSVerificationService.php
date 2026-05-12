@@ -1,8 +1,8 @@
 <?php
-namespace oshco\adfs;
+namespace Oshco\Adfs;
 
-use oshco\adfs\ADFSResponse;
-use oshco\adfs\ADFSUser;
+use Oshco\Adfs\ADFSResponse;
+use Oshco\Adfs\ADFSUser;
 use WebFiori\Http\ParamOption;
 use WebFiori\Http\ParamType;
 use WebFiori\Http\RequestMethod;
@@ -43,7 +43,7 @@ abstract class ADFSVerificationService extends WebService {
      * The username of the user will be taken from ADFS response as received.
      * The method must be implemented in a way that it looks for such user
      * in the application's database which has provided username/email and
-     * return its information as an object of type 'oshco\adfs\ADFSUser'.
+     * return its information as an object of type 'Oshco\Adfs\ADFSUser'.
      * If no such user was found, null should be returned.
      * 
      * @return ADFSUser|null

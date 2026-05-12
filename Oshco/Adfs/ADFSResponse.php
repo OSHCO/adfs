@@ -1,5 +1,5 @@
 <?php
-namespace oshco\adfs;
+namespace Oshco\Adfs;
 
 use Exception;
 use WebFiori\File\File;

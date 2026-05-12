@@ -1,8 +1,8 @@
 <?php
-namespace oshco\adfs\tests;
+namespace Tests;
 
-use oshco\adfs\ADFSUser;
-use oshco\adfs\ADFSVerificationService;
+use Oshco\Adfs\ADFSUser;
+use Oshco\Adfs\ADFSVerificationService;
 use PHPUnit\Framework\TestCase;
 use WebFiori\Http\WebServicesManager;
 

@@ -1,5 +1,5 @@
 <?php
-namespace oshco\adfs;
+namespace Oshco\Adfs;
 
 use WebFiori\Ui\HTMLNode;
 

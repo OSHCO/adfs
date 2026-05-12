@@ -1,7 +1,7 @@
 <?php
-namespace oshco\adfs\tests;
+namespace Tests;
 
-use oshco\adfs\SAMLRequest;
+use Oshco\Adfs\SAMLRequest;
 use PHPUnit\Framework\TestCase;
 
 class SAMLRequestTest extends TestCase {

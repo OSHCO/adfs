@@ -1,5 +1,5 @@
 <?php
-namespace oshco\adfs\tests;
+namespace Tests;
 
 /**
  * Helper to build SAML response XML for testing.

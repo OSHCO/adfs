@@ -1,8 +1,8 @@
 <?php
-namespace oshco\adfs\tests;
+namespace Tests;
 
 use Exception;
-use oshco\adfs\ADFSResponse;
+use Oshco\Adfs\ADFSResponse;
 use PHPUnit\Framework\TestCase;
 
 class ADFSResponseTest extends TestCase {
