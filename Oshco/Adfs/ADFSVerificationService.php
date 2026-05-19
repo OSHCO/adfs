@@ -122,6 +122,9 @@ abstract class ADFSVerificationService extends WebService {
         
         return '';
     }
+    public function isAuthorized(): bool {
+        return true;
+    } 
     /**
      * Returns SAML response that was received from ADFS server.
      * 
@@ -135,7 +138,13 @@ abstract class ADFSVerificationService extends WebService {
      * Process the request.
      */
     public function processRequest() {
-        $this->samlResponse = new ADFSResponse($_POST['SAMLResponse']);
+        if (isset($_POST['SAMLResponse'])) {
+            $this->samlResponse = new ADFSResponse($_POST['SAMLResponse']);
+        } else if (isset($_POST['SAMLResponse'])) {
+            $this->samlResponse = new ADFSResponse($_GET['SAMLResponse']);
+        } else {
+            $this->sendResponse('SAMLResponse is not provided.');
+        }
 
         if ($this->getSamlResponse()->isSuccess()) {
             $username = $this->getSamlResponse()->getUserName();
