@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.0.1](https://github.com/OSHCO/adfs/compare/v2.0.0...v2.0.1) (2026-05-19)
+
+
+### Bug Fixes
+
+* ADFSVerificationService.php ([a5978dd](https://github.com/OSHCO/adfs/commit/a5978dd5be09b136e6ffed419bf4f88bfd7c9108))
+
+
+### Miscellaneous Chores
+
+* Update sonar-project.properties ([ed50a10](https://github.com/OSHCO/adfs/commit/ed50a10d1c6a57b6afbd34c95d01467ece9c56a9))
+
 ## [1.3.0](https://github.com/OSHCO/adfs/compare/v1.2.0...v1.3.0) (2026-04-12)
 
 
