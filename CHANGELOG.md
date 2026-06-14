@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/OSHCO/adfs/compare/v2.0.1...v2.0.2) (2026-06-14)
+
+
+### Miscellaneous Chores
+
+* Updated Dependencies ([e108edf](https://github.com/OSHCO/adfs/commit/e108edffe9a584c5496e00dad388e111a8a7ede3))
+
 ## [2.0.1](https://github.com/OSHCO/adfs/compare/v2.0.0...v2.0.1) (2026-05-19)
 
 
