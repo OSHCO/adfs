@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7405b66005fcbccc652b10c98e64c668",
+    "content-hash": "a81fcf1f4fecfba7bfde81e432ecd4d5",
     "packages": [
         {
             "name": "webfiori/collections",
-            "version": "2.0.0",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WebFiori/collections.git",
-                "reference": "9345cca4dd6cb739fb471db835029f81fab1caa6"
+                "reference": "c76fa015882412281a7bc2d58f28cffb0cb02a2c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WebFiori/collections/zipball/9345cca4dd6cb739fb471db835029f81fab1caa6",
-                "reference": "9345cca4dd6cb739fb471db835029f81fab1caa6",
+                "url": "https://api.github.com/repos/WebFiori/collections/zipball/c76fa015882412281a7bc2d58f28cffb0cb02a2c",
+                "reference": "c76fa015882412281a7bc2d58f28cffb0cb02a2c",
                 "shasum": ""
             },
             "require": {
@@ -46,31 +46,31 @@
             ],
             "support": {
                 "issues": "https://github.com/WebFiori/collections/issues",
-                "source": "https://github.com/WebFiori/collections/tree/v2.0.0"
+                "source": "https://github.com/WebFiori/collections/tree/v2.0.2"
             },
-            "time": "2025-08-21T14:56:08+00:00"
+            "time": "2026-06-10T11:45:58+00:00"
         },
         {
             "name": "webfiori/file",
-            "version": "2.0.0",
+            "version": "2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WebFiori/file.git",
-                "reference": "904c9ffa9432d04ac1d536e5a707fd43c84b40e5"
+                "reference": "ffe8ba812a7e6d73ad13afc690db72e71df9f22f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WebFiori/file/zipball/904c9ffa9432d04ac1d536e5a707fd43c84b40e5",
-                "reference": "904c9ffa9432d04ac1d536e5a707fd43c84b40e5",
+                "url": "https://api.github.com/repos/WebFiori/file/zipball/ffe8ba812a7e6d73ad13afc690db72e71df9f22f",
+                "reference": "ffe8ba812a7e6d73ad13afc690db72e71df9f22f",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.0",
-                "webfiori/jsonx": "4.0.x"
+                "php": ">=8.1",
+                "webfiori/jsonx": "5.0.x"
             },
             "require-dev": {
-                "phpunit/phpunit": "^10.0",
-                "webfiori/http": "*"
+                "friendsofphp/php-cs-fixer": "^3.92",
+                "phpunit/phpunit": "^10.0"
             },
             "type": "library",
             "autoload": {
@@ -98,29 +98,29 @@
             ],
             "support": {
                 "issues": "https://github.com/WebFiori/file/issues",
-                "source": "https://github.com/WebFiori/file/tree/v2.0.0"
+                "source": "https://github.com/WebFiori/file/tree/v2.1.1"
             },
-            "time": "2025-08-06T22:16:05+00:00"
+            "time": "2026-06-11T11:09:38+00:00"
         },
         {
             "name": "webfiori/http",
-            "version": "5.0.5",
+            "version": "6.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WebFiori/http.git",
-                "reference": "2958177698151be6387ec26112868f4428b393ba"
+                "reference": "31f4a8c3b48e326cca337a507d21c4ca28873854"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WebFiori/http/zipball/2958177698151be6387ec26112868f4428b393ba",
-                "reference": "2958177698151be6387ec26112868f4428b393ba",
+                "url": "https://api.github.com/repos/WebFiori/http/zipball/31f4a8c3b48e326cca337a507d21c4ca28873854",
+                "reference": "31f4a8c3b48e326cca337a507d21c4ca28873854",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "ext-mbstring": "*",
                 "php": ">=8.1",
-                "webfiori/jsonx": "4.0.x"
+                "webfiori/jsonx": "5.0.x"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.92",
@@ -149,22 +149,22 @@
             ],
             "support": {
                 "issues": "https://github.com/WebFiori/http/issues",
-                "source": "https://github.com/WebFiori/http/tree/v5.0.5"
+                "source": "https://github.com/WebFiori/http/tree/v6.0.1"
             },
-            "time": "2026-03-05T12:03:16+00:00"
+            "time": "2026-06-13T15:55:38+00:00"
         },
         {
             "name": "webfiori/jsonx",
-            "version": "4.0.1",
+            "version": "5.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WebFiori/json.git",
-                "reference": "ad983ac6683ff0d12e1ef57546fbb68dd4d317ad"
+                "reference": "52d28e4df98743e523ad15314a135be4f8418446"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WebFiori/json/zipball/ad983ac6683ff0d12e1ef57546fbb68dd4d317ad",
-                "reference": "ad983ac6683ff0d12e1ef57546fbb68dd4d317ad",
+                "url": "https://api.github.com/repos/WebFiori/json/zipball/52d28e4df98743e523ad15314a135be4f8418446",
+                "reference": "52d28e4df98743e523ad15314a135be4f8418446",
                 "shasum": ""
             },
             "require": {
@@ -185,7 +185,7 @@
             "license": [
                 "MIT"
             ],
-            "description": "PHP library for creating well-formatted JSON strings.",
+            "description": "PHP library for creating JSON.",
             "keywords": [
                 "json",
                 "jsonx",
@@ -193,7 +193,7 @@
             ],
             "support": {
                 "issues": "https://github.com/WebFiori/json/issues",
-                "source": "https://github.com/WebFiori/json/tree/v4.0.1"
+                "source": "https://github.com/WebFiori/json/tree/v5.0.0"
             },
             "funding": [
                 {
@@ -201,20 +201,20 @@
                     "type": "custom"
                 }
             ],
-            "time": "2026-03-04T10:29:17+00:00"
+            "time": "2026-06-11T06:30:56+00:00"
         },
         {
             "name": "webfiori/ui",
-            "version": "4.0.0",
+            "version": "4.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WebFiori/ui.git",
-                "reference": "95b6bd5860584278577aeb603d4b2f6c576d901a"
+                "reference": "911145a532b226a19e742a79f851f8b9b71beb66"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WebFiori/ui/zipball/95b6bd5860584278577aeb603d4b2f6c576d901a",
-                "reference": "95b6bd5860584278577aeb603d4b2f6c576d901a",
+                "url": "https://api.github.com/repos/WebFiori/ui/zipball/911145a532b226a19e742a79f851f8b9b71beb66",
+                "reference": "911145a532b226a19e742a79f851f8b9b71beb66",
                 "shasum": ""
             },
             "require": {
@@ -245,9 +245,9 @@
             ],
             "support": {
                 "issues": "https://github.com/WebFiori/ui/issues",
-                "source": "https://github.com/WebFiori/ui/tree/v4.0.0"
+                "source": "https://github.com/WebFiori/ui/tree/v4.0.1"
             },
-            "time": "2025-10-07T21:08:40+00:00"
+            "time": "2026-06-02T07:39:56+00:00"
         }
     ],
     "packages-dev": [
