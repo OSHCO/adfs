@@ -8,17 +8,10 @@
         }
     ],
     "require": {
-<<<<<<< Updated upstream
         "webfiori/http": "5.0.*",
         "webfiori/file": "2.0.*",
         "webfiori/jsonx": "4.0.*",
         "webfiori/ui": "4.0.*"
-=======
-        "webfiori/http":"6.0.*",
-        "webfiori/file":"2.1.*",
-        "webfiori/jsonx":"5.0.*",
-        "webfiori/ui":"4.0.*"
->>>>>>> Stashed changes
     },
     "keywords": [
         "ADFS",
