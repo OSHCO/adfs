@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.3](https://github.com/OSHCO/adfs/compare/v2.0.2...v2.0.3) (2026-09-24)
+
+
+### Miscellaneous Chores
+
+* **deps:** loosen version constraints for webfiori packages ([747d14e](https://github.com/OSHCO/adfs/commit/747d14e78ddc8fa1fe6dca14bf9ec9e58a5a8e25))
+
 ## [2.0.2](https://github.com/OSHCO/adfs/compare/v2.0.1...v2.0.2) (2026-06-14)
 
 
