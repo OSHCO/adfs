@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/OSHCO/adfs/compare/v2.0.3...v3.0.0) (2026-11-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* subclasses of ADFSVerificationService must implement getValidator() and return an ADFSResponseValidator configured with the ADFS token-signing certificate and the relying party identifier. new ADFSResponse() throws SAMLValidationException on malformed input, and a missing username is reported during validation. SHA-1 signatures are rejected unless setAllowSha1(true) is called.
+
+### Features
+
+* verify SAML response signatures and assertion conditions ([1c1b23e](https://github.com/OSHCO/adfs/commit/1c1b23e255f84e514d14f03c915066c75fd52645))
+
 ## [2.0.3](https://github.com/OSHCO/adfs/compare/v2.0.2...v2.0.3) (2026-09-24)
 
 
