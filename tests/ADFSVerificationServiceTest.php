@@ -1,8 +1,11 @@
 <?php
 namespace Tests;
 
+use Oshco\Adfs\ADFSResponse;
+use Oshco\Adfs\ADFSResponseValidator;
 use Oshco\Adfs\ADFSUser;
 use Oshco\Adfs\ADFSVerificationService;
+use Oshco\Adfs\SAMLValidationException;
 use PHPUnit\Framework\TestCase;
 use WebFiori\Http\WebServicesManager;
 
@@ -14,6 +17,8 @@ class TestVerificationService extends ADFSVerificationService {
     private $successCalled = false;
     private $failCalled = false;
     private $lastUser;
+    private ?string $requestedUsername = null;
+    private bool $replayed = false;
 
     public function __construct(string $name = 'test-verify', string $failRedirect = 'https://example.com/fail') {
         parent::__construct($name, $failRedirect);
@@ -23,8 +28,26 @@ class TestVerificationService extends ADFSVerificationService {
         $this->mockUser = $user;
     }
 
+    public function setReplayed(bool $replayed) {
+        $this->replayed = $replayed;
+    }
+
+    public function getRequestedUsername(): ?string {
+        return $this->requestedUsername;
+    }
+
     public function getUser(string $username): ?ADFSUser {
+        $this->requestedUsername = $username;
+
         return $this->mockUser;
+    }
+
+    public function getValidator(): ADFSResponseValidator {
+        return testValidator();
+    }
+
+    public function isAssertionReplayed(ADFSResponse $response): bool {
+        return $this->replayed;
     }
 
     public function onSuccess(ADFSUser $user) {
@@ -75,8 +98,19 @@ class RealFailVerificationService extends ADFSVerificationService {
         return $this->mockUser;
     }
 
+    public function getValidator(): ADFSResponseValidator {
+        return testValidator();
+    }
+
     public function onSuccess(ADFSUser $user) {
     }
+}
+
+function testValidator(): ADFSResponseValidator {
+    $validator = new ADFSResponseValidator(SAMLResponseBuilder::certificate(), SAMLResponseBuilder::AUDIENCE);
+    $validator->setCurrentTime(SAMLResponseBuilder::NOW);
+
+    return $validator;
 }
 
 class TestUser implements ADFSUser {
@@ -145,56 +179,135 @@ class ADFSVerificationServiceTest extends TestCase {
 
     public function testProcessRequestCallsOnSuccessWhenUserFound() {
         $svc = new TestVerificationService();
-        $user = new TestUser(42);
-        $svc->setMockUser($user);
+        $svc->setMockUser(new TestUser(42));
 
-        $_POST['SAMLResponse'] = SAMLResponseBuilder::buildSuccess('testuser@example.com', 'TestApp');
+        $_POST['SAMLResponse'] = SAMLResponseBuilder::create()->withUsername('TestUser@example.com')->withAppId('TestApp')->encoded();
         $svc->processRequest();
 
         $this->assertTrue($svc->wasSuccessCalled());
         $this->assertFalse($svc->wasFailCalled());
         $this->assertSame(42, $svc->getLastUser()->getId());
+        $this->assertSame('testuser@example.com', $svc->getRequestedUsername());
         $this->assertSame('TestApp', $svc->getAppName());
+        $this->assertNull($svc->getError());
+        $this->assertTrue($svc->getSamlResponse()->isVerified());
     }
 
     public function testProcessRequestCallsOnFailWhenUserNotFound() {
         $svc = new TestVerificationService();
         $svc->setMockUser(null);
 
-        $_POST['SAMLResponse'] = SAMLResponseBuilder::buildSuccess('unknown@example.com');
+        $_POST['SAMLResponse'] = SAMLResponseBuilder::create()->withUsername('unknown@example.com')->encoded();
         $svc->processRequest();
 
         $this->assertTrue($svc->wasFailCalled());
         $this->assertFalse($svc->wasSuccessCalled());
+        $this->assertSame(ADFSVerificationService::ERROR_USER_NOT_FOUND, $svc->getError());
     }
 
     public function testProcessRequestCallsOnFailWhenSAMLFails() {
         $svc = new TestVerificationService();
-        $user = new TestUser(1);
-        $svc->setMockUser($user);
+        $svc->setMockUser(new TestUser(1));
 
-        $_POST['SAMLResponse'] = SAMLResponseBuilder::buildFailure();
+        $_POST['SAMLResponse'] = SAMLResponseBuilder::create()->withStatus('urn:oasis:names:tc:SAML:2.0:status:Requester')->encoded();
         $svc->processRequest();
 
         $this->assertTrue($svc->wasFailCalled());
         $this->assertFalse($svc->wasSuccessCalled());
+        $this->assertSame(SAMLValidationException::REASON_STATUS_NOT_SUCCESS, $svc->getError());
+        $this->assertNull($svc->getRequestedUsername());
     }
 
-    public function testProcessRequestSetsSamlResponse() {
+    public function testForgedUnsignedResponseDoesNotSignIn() {
+        // Regression test: version 2 accepted any well-formed XML.
         $svc = new TestVerificationService();
-        $svc->setMockUser(new TestUser());
+        $svc->setMockUser(new TestUser(1));
 
-        $_POST['SAMLResponse'] = SAMLResponseBuilder::buildSuccess('admin@example.com', 'My_App');
+        $_POST['SAMLResponse'] = SAMLResponseBuilder::encode(SAMLResponseBuilder::create()->withUsername('admin@example.com')->unsignedXml());
         $svc->processRequest();
 
-        $this->assertNotNull($svc->getSamlResponse());
-        $this->assertTrue($svc->getSamlResponse()->isSuccess());
-        $this->assertSame('admin@example.com', $svc->getSamlResponse()->getUserName());
-        $this->assertSame('My App', $svc->getAppName());
+        $this->assertFalse($svc->wasSuccessCalled());
+        $this->assertTrue($svc->wasFailCalled());
+        $this->assertSame(SAMLValidationException::REASON_UNSIGNED, $svc->getError());
+        $this->assertNull($svc->getRequestedUsername(), 'getUser() must not be called for an unverified response');
+        $this->assertSame('', $svc->getAppName());
+        $this->assertFalse($svc->getSamlResponse()->isVerified());
+    }
+
+    public function testResponseSignedByAnotherKeyDoesNotSignIn() {
+        $svc = new TestVerificationService();
+        $svc->setMockUser(new TestUser(1));
+
+        $_POST['SAMLResponse'] = SAMLResponseBuilder::create()->withSigningKey('attacker')->encoded();
+        $svc->processRequest();
+
+        $this->assertFalse($svc->wasSuccessCalled());
+        $this->assertSame(SAMLValidationException::REASON_INVALID_SIGNATURE, $svc->getError());
+        $this->assertNotEmpty($svc->getErrorMessage());
+    }
+
+    public function testMalformedResponseCallsOnFail() {
+        $svc = new TestVerificationService();
+        $svc->setMockUser(new TestUser(1));
+
+        $_POST['SAMLResponse'] = base64_encode('<not-saml/>');
+        $svc->processRequest();
+
+        $this->assertTrue($svc->wasFailCalled());
+        $this->assertSame(SAMLValidationException::REASON_MALFORMED, $svc->getError());
+        $this->assertNull($svc->getSamlResponse());
+    }
+
+    public function testReplayedAssertionCallsOnFail() {
+        $svc = new TestVerificationService();
+        $svc->setMockUser(new TestUser(1));
+        $svc->setReplayed(true);
+
+        $_POST['SAMLResponse'] = SAMLResponseBuilder::create()->encoded();
+        $svc->processRequest();
+
+        $this->assertFalse($svc->wasSuccessCalled());
+        $this->assertSame(SAMLValidationException::REASON_REPLAYED, $svc->getError());
+    }
+
+    public function testMissingResponseDoesNotCallHandlers() {
+        $svc = new TestVerificationService();
+        $mgr = new WebServicesManager();
+        $mgr->addService($svc);
+        $svc->processRequest();
+
+        $this->assertFalse($svc->wasSuccessCalled());
+        $this->assertFalse($svc->wasFailCalled());
+        $this->assertSame(ADFSVerificationService::ERROR_MISSING_RESPONSE, $svc->getError());
+        $this->assertSame(400, $mgr->getResponse()->getCode());
+    }
+
+    public function testResponseInQueryStringIsIgnored() {
+        $svc = new TestVerificationService();
+        $svc->setMockUser(new TestUser(1));
+        $_GET['SAMLResponse'] = SAMLResponseBuilder::create()->encoded();
+        $svc->processRequest();
+
+        $this->assertFalse($svc->wasSuccessCalled());
+        $this->assertSame(ADFSVerificationService::ERROR_MISSING_RESPONSE, $svc->getError());
+    }
+
+    public function testErrorIsResetBetweenRequests() {
+        $svc = new TestVerificationService();
+        $svc->setMockUser(new TestUser(1));
+
+        $_POST['SAMLResponse'] = SAMLResponseBuilder::create()->withSigningKey('attacker')->encoded();
+        $svc->processRequest();
+        $this->assertNotNull($svc->getError());
+
+        $_POST['SAMLResponse'] = SAMLResponseBuilder::create()->encoded();
+        $svc->processRequest();
+        $this->assertNull($svc->getError());
+        $this->assertNull($svc->getErrorMessage());
     }
 
     protected function tearDown(): void {
-        unset($_POST['SAMLResponse']);
+        unset($_POST['SAMLResponse'], $_GET['SAMLResponse']);
     }
 
     private function createRealFailService(string $failRedirect = 'https://example.com/fail'): RealFailVerificationService {
