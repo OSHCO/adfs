@@ -211,6 +211,43 @@ class ADFSResponseValidatorTest extends TestCase {
         $this->assertRejected(SAMLValidationException::REASON_UNSUPPORTED_SIGNATURE, $builder);
     }
 
+    public function testSha1DigestUnderSha256SignatureIsRejected() {
+        $builder = SAMLResponseBuilder::create()->withDigestAlgorithm('http://www.w3.org/2000/09/xmldsig#sha1');
+        $this->assertRejected(SAMLValidationException::REASON_UNSUPPORTED_SIGNATURE, $builder);
+    }
+
+    public function testUnknownCanonicalizationIsRejected() {
+        $builder = SAMLResponseBuilder::create()->mutate(function (DOMDocument $doc) {
+            $this->xpath($doc)->query('//ds:CanonicalizationMethod')->item(0)
+                ->setAttribute('Algorithm', 'http://www.w3.org/2006/12/xml-c14n11');
+        });
+        $this->assertRejected(SAMLValidationException::REASON_UNSUPPORTED_SIGNATURE, $builder);
+    }
+
+    public function testSecondReferenceIsRejected() {
+        $builder = SAMLResponseBuilder::create()->mutate(function (DOMDocument $doc) {
+            $reference = $this->xpath($doc)->query('//ds:Reference')->item(0);
+            $reference->parentNode->appendChild($reference->cloneNode(true));
+        });
+        $this->assertRejected(SAMLValidationException::REASON_UNSUPPORTED_SIGNATURE, $builder);
+    }
+
+    public function testSecondSignatureOnSameElementIsRejected() {
+        $builder = SAMLResponseBuilder::create()->mutate(function (DOMDocument $doc) {
+            $signature = $this->xpath($doc)->query('//ds:Signature')->item(0);
+            $signature->parentNode->insertBefore($signature->cloneNode(true), $signature);
+        });
+        $this->assertRejected(SAMLValidationException::REASON_UNSUPPORTED_SIGNATURE, $builder);
+    }
+
+    public function testTooManyTransformsIsRejected() {
+        $builder = SAMLResponseBuilder::create()->mutate(function (DOMDocument $doc) {
+            $transform = $this->xpath($doc)->query('//ds:Transform')->item(1);
+            $transform->parentNode->appendChild($transform->cloneNode(true));
+        });
+        $this->assertRejected(SAMLValidationException::REASON_UNSUPPORTED_SIGNATURE, $builder);
+    }
+
     public function testEncryptedAssertionIsRejected() {
         $builder = SAMLResponseBuilder::create()->mutate(function (DOMDocument $doc) {
             $encrypted = $doc->createElementNS('urn:oasis:names:tc:SAML:2.0:assertion', 'EncryptedAssertion');
@@ -231,6 +268,42 @@ class ADFSResponseValidatorTest extends TestCase {
     public function testWrongAudienceIsRejected() {
         // An assertion ADFS issued to another relying party.
         $this->assertRejected(SAMLValidationException::REASON_AUDIENCE_MISMATCH, SAMLResponseBuilder::create()->withAudience('https://other-app.example.com'));
+    }
+
+    public function testMissingAudienceRestrictionIsRejected() {
+        // An assertion with no audience at all must not be accepted by every application.
+        $builder = SAMLResponseBuilder::create()->withAudienceRestrictions([]);
+        $this->assertRejected(SAMLValidationException::REASON_AUDIENCE_MISMATCH, $builder);
+    }
+
+    public function testEveryAudienceRestrictionMustIncludeAudience() {
+        // Restrictions are ANDed: the second one excludes this application.
+        $builder = SAMLResponseBuilder::create()->withAudienceRestrictions([
+            [SAMLResponseBuilder::AUDIENCE],
+            ['https://other-app.example.com'],
+        ]);
+        $this->assertRejected(SAMLValidationException::REASON_AUDIENCE_MISMATCH, $builder);
+    }
+
+    public function testAudienceAmongSeveralIsAccepted() {
+        $builder = SAMLResponseBuilder::create()->withAudienceRestrictions([
+            ['https://other-app.example.com', SAMLResponseBuilder::AUDIENCE],
+        ]);
+        $this->assertTrue($this->validate($builder)->isVerified());
+    }
+
+    public function testMissingConditionsIsRejected() {
+        $this->assertRejected(SAMLValidationException::REASON_AUDIENCE_MISMATCH, SAMLResponseBuilder::create()->withoutConditions());
+    }
+
+    public function testHolderOfKeyConfirmationIsNotTreatedAsBearer() {
+        $builder = SAMLResponseBuilder::create()->withConfirmationMethod('urn:oasis:names:tc:SAML:2.0:cm:holder-of-key');
+        $this->assertRejected(SAMLValidationException::REASON_INVALID_SUBJECT_CONFIRMATION, $builder);
+    }
+
+    public function testSubjectConfirmationWithoutExpiryIsRejected() {
+        $builder = SAMLResponseBuilder::create()->withSubjectConfirmationExpiry(null);
+        $this->assertRejected(SAMLValidationException::REASON_INVALID_SUBJECT_CONFIRMATION, $builder);
     }
 
     public function testExpiredConditionsAreRejected() {

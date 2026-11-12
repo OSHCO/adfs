@@ -26,6 +26,13 @@ class SAMLResponseBuilder {
     private string $assertionId = '_assertion1';
     private ?array $attributes = null;
     private string $audience = self::AUDIENCE;
+    /**
+     * @var string[][]|null Audiences per AudienceRestriction; null means one
+     * restriction holding $audience.
+     */
+    private ?array $audienceRestrictions = null;
+    private string $confirmationMethod = 'urn:oasis:names:tc:SAML:2.0:cm:bearer';
+    private bool $includeConditions = true;
     private string $digestAlgorithm = XMLSecurityDSig::SHA256;
     private string $issuer = self::ISSUER;
     private string $keyName = 'adfs';
@@ -37,7 +44,7 @@ class SAMLResponseBuilder {
     private ?string $responseInResponseTo = null;
     private string $responseId = '_response1';
     private ?string $scdInResponseTo = null;
-    private int $scdNotOnOrAfter = self::NOW + 300;
+    private ?int $scdNotOnOrAfter = self::NOW + 300;
     private bool $signAssertion = true;
     private string $signatureAlgorithm = XMLSecurityKey::RSA_SHA256;
     private bool $signResponse = false;
@@ -124,6 +131,34 @@ class SAMLResponseBuilder {
         return $this;
     }
 
+    /**
+     * @param string[][] $restrictions One entry per AudienceRestriction. An
+     * empty array produces Conditions without any AudienceRestriction.
+     */
+    public function withAudienceRestrictions(array $restrictions): self {
+        $this->audienceRestrictions = $restrictions;
+
+        return $this;
+    }
+
+    public function withConfirmationMethod(string $method): self {
+        $this->confirmationMethod = $method;
+
+        return $this;
+    }
+
+    public function withDigestAlgorithm(string $algorithm): self {
+        $this->digestAlgorithm = $algorithm;
+
+        return $this;
+    }
+
+    public function withoutConditions(): self {
+        $this->includeConditions = false;
+
+        return $this;
+    }
+
     public function withAudience(string $audience): self {
         $this->audience = $audience;
 
@@ -184,7 +219,10 @@ class SAMLResponseBuilder {
         return $this;
     }
 
-    public function withSubjectConfirmationExpiry(int $notOnOrAfter): self {
+    /**
+     * @param int|null $notOnOrAfter Null omits the attribute.
+     */
+    public function withSubjectConfirmationExpiry(?int $notOnOrAfter): self {
         $this->scdNotOnOrAfter = $notOnOrAfter;
 
         return $this;
@@ -230,19 +268,32 @@ class SAMLResponseBuilder {
         $nameIdXml = $this->nameId !== null
             ? '<NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">'.$esc($this->nameId).'</NameID>'
             : '';
+        $restrictions = $this->audienceRestrictions ?? [[$this->audience]];
+        $restrictionXml = '';
+
+        foreach ($restrictions as $audiences) {
+            $restrictionXml .= '<AudienceRestriction>';
+
+            foreach ($audiences as $audience) {
+                $restrictionXml .= '<Audience>'.$esc($audience).'</Audience>';
+            }
+            $restrictionXml .= '</AudienceRestriction>';
+        }
+        $conditionsXml = !$this->includeConditions ? '' :
+            '<Conditions NotBefore="'.$time($this->notBefore).'" NotOnOrAfter="'.$time($this->notOnOrAfter).'">'
+            .$restrictionXml.'</Conditions>';
+        $scdExpiry = $this->scdNotOnOrAfter !== null ? 'NotOnOrAfter="'.$time($this->scdNotOnOrAfter).'" ' : '';
         $isSuccess = $this->status === 'urn:oasis:names:tc:SAML:2.0:status:Success';
 
         $assertion = !$isSuccess ? '' :
             '<Assertion ID="'.$esc($this->assertionId).'" IssueInstant="'.$time(self::NOW).'" Version="2.0" xmlns="urn:oasis:names:tc:SAML:2.0:assertion">'
             .'<Issuer>'.$esc($this->issuer).'</Issuer>'
             .'<Subject>'.$nameIdXml
-            .'<SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">'
+            .'<SubjectConfirmation Method="'.$esc($this->confirmationMethod).'">'
             .'<SubjectConfirmationData '.($scdIrt !== '' ? 'InResponseTo="'.$esc($scdIrt).'" ' : '')
-            .'NotOnOrAfter="'.$time($this->scdNotOnOrAfter).'" Recipient="'.$esc($this->recipient).'" />'
+            .$scdExpiry.'Recipient="'.$esc($this->recipient).'" />'
             .'</SubjectConfirmation></Subject>'
-            .'<Conditions NotBefore="'.$time($this->notBefore).'" NotOnOrAfter="'.$time($this->notOnOrAfter).'">'
-            .'<AudienceRestriction><Audience>'.$esc($this->audience).'</Audience></AudienceRestriction>'
-            .'</Conditions>'
+            .$conditionsXml
             .'<AttributeStatement>'.$attributeXml.'</AttributeStatement>'
             .'<AuthnStatement AuthnInstant="'.$time(self::NOW).'" SessionIndex="'.$esc($this->assertionId).'">'
             .'<AuthnContext><AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</AuthnContextClassRef></AuthnContext>'

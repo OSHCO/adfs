@@ -367,6 +367,8 @@ class ADFSResponseValidator {
             $dsig->validateReference();
             $validated = $dsig->getValidatedNodes() ?? [];
 
+            // Second layer: checkSignedInfo() and the unique-ID check already
+            // guarantee this; kept in case either is weakened later.
             if (count($validated) !== 1 || !reset($validated)->isSameNode($signed)) {
                 throw new Exception('Signature does not reference the signed element.');
             }
